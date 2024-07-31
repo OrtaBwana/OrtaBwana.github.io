@@ -60,7 +60,7 @@
             height: 60%;
         }
 
-        #start-button {
+        #start-button, #stop-button {
             position: absolute;
             padding: 10px 20px;
             font-size: 16px;
@@ -71,8 +71,12 @@
             cursor: pointer;
         }
 
-        #start-button:hover {
+        #start-button:hover, #stop-button:hover {
             background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        #stop-button {
+            display: none;
         }
 
         .label-container {
@@ -135,6 +139,7 @@
         </div>
         <div id="webcam-container" class="webcam-container">
             <button id="start-button" type="button" onclick="init()">Iniciar</button>
+            <button id="stop-button" type="button" onclick="stop()">Parar</button>
         </div>
         <div id="label-container" class="label-container"></div>
         <div class="status-container">
@@ -151,6 +156,7 @@
         const URL = "https://teachablemachine.withgoogle.com/models/_JTx2z6Bw/";
 
         let model, webcam, labelContainer, maxPredictions;
+        let stopLoop = false;
 
         async function init() {
             const modelURL = URL + "model.json";
@@ -163,10 +169,12 @@
             webcam = new tmImage.Webcam(400, 400, flip);
             await webcam.setup();
             await webcam.play();
+            stopLoop = false;
             window.requestAnimationFrame(loop);
 
             document.getElementById("webcam-container").appendChild(webcam.canvas);
             document.getElementById("start-button").style.display = 'none';
+            document.getElementById("stop-button").style.display = 'block';
             labelContainer = document.getElementById("label-container");
             for (let i = 0; i < maxPredictions; i++) {
                 labelContainer.appendChild(document.createElement("div"));
@@ -174,6 +182,7 @@
         }
 
         async function loop() {
+            if (stopLoop) return;
             webcam.update();
             await predict();
             window.requestAnimationFrame(loop);
@@ -196,6 +205,14 @@
 
             document.getElementById("emotion").innerText = emotion;
             document.getElementById("percentage").innerText = (highestProbability * 100).toFixed(0) + '%';
+        }
+
+        function stop() {
+            stopLoop = true;
+            webcam.stop();
+            document.getElementById("webcam-container").removeChild(webcam.canvas);
+            document.getElementById("stop-button").style.display = 'none';
+            document.getElementById("start-button").style.display = 'block';
         }
     </script>
 </body>
