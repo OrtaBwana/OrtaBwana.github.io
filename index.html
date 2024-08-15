@@ -84,7 +84,7 @@
         }
 
         .status-container {
-            margin: 20px;
+            margin: 60px;
         }
 
         .status-container p {
@@ -203,7 +203,7 @@
             maxPredictions = model.getTotalClasses();
 
             const flip = true;
-            webcam = new tmImage.Webcam(400, 400, flip);
+            webcam = new tmImage.Webcam(300, 300, flip);
             await webcam.setup();
             await webcam.play();
             stopLoop = false;
