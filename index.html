@@ -33,7 +33,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            font-family:system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
 
         .header {
@@ -128,6 +128,46 @@
             margin-right: 8px;
             font-size: 20px;
         }
+
+        .emotion-bar {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .emotion-label {
+            width: 100px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .emotion-progress {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-left: 10px;
+        }
+
+        .emotion-progress div {
+            height: 100%;
+            border-radius: 10px;
+        }
+
+        /* Text colors for different emotions */
+        .feliz { color: #FFA500; } /* Orange */
+        .triste { color: #00BFFF; } /* DeepSkyBlue */
+        .enojado { color: #FF6347; } /* Tomato */
+        .neutral { color: #808080; } /* Gray */
+        .temeroso { color: #9400D3; } /* DarkViolet */
+
+        /* Bar colors for different emotions */
+        .feliz-bar { background-color: #FFA500; } /* Orange */
+        .triste-bar { background-color: #00BFFF; } /* DeepSkyBlue */
+        .enojado-bar { background-color: #FF6347; } /* Tomato */
+        .neutral-bar { background-color: #808080; } /* Gray */
+        .temeroso-bar { background-color: #9400D3; } /* DarkViolet */
     </style>
 </head>
 
@@ -139,7 +179,8 @@
         </div>
         <div id="label-container" class="label-container"></div>
         <div class="status-container">
-            <p id="status">Estado: <span id="emotion">N/A</span> <span id="percentage">0%</span></p>
+            <p>Estado de ánimo:</p>
+            <div id="emotions-list"></div>
         </div>
         <div class="button-container">
             <button id="save-button"><i class="fa-solid fa-floppy-disk"></i>Guardar</button>
@@ -186,21 +227,23 @@
 
         async function predict() {
             const prediction = await model.predict(webcam.canvas);
-            let highestProbability = 0;
-            let emotion = 'N/A';
+            let emotionsList = '';
 
             for (let i = 0; i < maxPredictions; i++) {
-                const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-                labelContainer.childNodes[i].innerHTML = classPrediction;
+                const probability = (prediction[i].probability * 100).toFixed(0);
+                const className = prediction[i].className.toLowerCase();
 
-                if (prediction[i].probability > highestProbability) {
-                    highestProbability = prediction[i].probability;
-                    emotion = prediction[i].className;
-                }
+                emotionsList += `
+                    <div class="emotion-bar">
+                        <div class="emotion-label ${className}">${prediction[i].className}</div>
+                        <div class="emotion-progress">
+                            <div class="${className}-bar" style="width: ${probability}%;"></div>
+                        </div>
+                        <div>${probability}%</div>
+                    </div>`;
             }
 
-            document.getElementById("emotion").innerText = emotion;
-            document.getElementById("percentage").innerText = (highestProbability * 100).toFixed(0) + '%';
+            document.getElementById("emotions-list").innerHTML = emotionsList;
         }
 
         function stop() {
