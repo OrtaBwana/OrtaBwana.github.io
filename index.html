@@ -184,7 +184,7 @@
             <div id="emotions-list"></div>
         </div>
         <div class="button-container">
-            <button id="save-button"><i class="fa-solid fa-floppy-disk"></i>Guardar</button>
+            <button id="save-button" onclick="saveData()"><i class="fa-solid fa-floppy-disk"></i>Guardar</button>
         </div>
     </div>
 
@@ -253,6 +253,11 @@
             document.getElementById("webcam-container").removeChild(webcam.canvas);
             document.getElementById("stop-button").style.display = 'none';
             document.getElementById("start-button").style.display = 'block';
+        }
+        function saveData() {
+            const emotion = document.getElementById("emotion").innerText;
+            const percentage = document.getElementById("percentage").innerText;
+            window.ReactNativeWebView.postMessage(JSON.stringify({ emotion, percentage }));
         }
     </script>
 </body>
